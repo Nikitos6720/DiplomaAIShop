@@ -91,7 +91,7 @@ public class AntAlgorithm : IArtificialIntelligence, IDisposable
         double logDelta = layer[0] * 2.0;
         double logYt = SafeLog(rawWindow.Last());
         double logYt1 = logYt + logDelta;
-        return Math.Exp(logYt1) * 0.2;
+        return Math.Exp(logYt1) * 0.1;
     }
 
     public void Train(double[][] inputs, double[] outputs)

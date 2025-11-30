@@ -1,19 +1,20 @@
 ﻿using DiplomaAIShop.Controllers;
 using DiplomaAIShop.Controllers.AI;
-using DiplomaAIShop.Models;
 using DiplomaAIShop.Views.General;
 
 using Microsoft.EntityFrameworkCore;
 
 using System.Windows.Forms.DataVisualization.Charting;
 
-
 namespace DiplomaAIShop.Views.Diagram;
 
 public partial class SellingDiagram : Form
 {
     private IMainForm _main;
-    private Series _series;
+
+    private Series _realSeries;
+    private Series _perSeries;
+    private Series _antSeries;
 
     public SellingDiagram(IMainForm main)
     {
@@ -28,39 +29,81 @@ public partial class SellingDiagram : Form
 
     private void CreateChart()
     {
-        _series = new()
+        chart.Legends.Add(new Legend("MainLegend")
+        {
+            Docking = Docking.Top,
+            Alignment = StringAlignment.Center,
+            Font = new Font("Segoe UI", 10, FontStyle.Regular),
+            ForeColor = Color.WhiteSmoke,
+            BackColor = Color.FromArgb(30, 30, 30),
+        });
+
+        _realSeries = new Series("Real Price")
         {
             ChartType = SeriesChartType.Line,
-            Color = Color.FromArgb(245, 143, 1),
-            LabelForeColor = Color.FromArgb(245, 143, 1)
+            Color = Color.White,
+            LabelForeColor = Color.WhiteSmoke,
+            Legend = "MainLegend",
+            LegendText = "real"
         };
 
-        chart.Series.Add(_series);
+        _perSeries = new Series("Gradient")
+        {
+            ChartType = SeriesChartType.Line,
+            Color = Color.Lime,
+            LabelForeColor = Color.Lime,
+            Legend = "MainLegend",
+            LegendText = "Gradient"
+        };
 
-        GetData(_series);
-        GettingPredictions();
+        _antSeries = new Series("Ant algorithm")
+        {
+            ChartType = SeriesChartType.Line,
+            Color = Color.Yellow,
+            LabelForeColor = Color.Yellow,
+            Legend = "MainLegend",
+            LegendText = "Ant algorithm"
+        };
+        chart.Series.Add(_realSeries);
+        chart.Series.Add(_perSeries);
+        chart.Series.Add(_antSeries);
+
+        GetData();
     }
 
-    private async void GetData(Series series)
+    private async void GetData()
     {
         using var db = new DatabaseController(new());
 
-        await db.Sales
-                .Include(x => x.Checks)
-                .ThenInclude(x => x.Lines)
-                .ThenInclude(x => x.Product)
-                .LoadAsync();
+        var sales = db.Sales
+                    .OrderBy(x => x.Date)
+                    .ToList()
+                    .TakeLast(30);
 
         int i = 1;
-        foreach (var s in db.Sales.Local)
+        foreach (var s in sales)
         {
-            chart.ChartAreas[0].AxisX.CustomLabels.Add(new CustomLabel(i - 0.5, i + 0.5, s.Date.ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None));
-            _series.Points.AddXY(i, s.TotalAmount);
-            _series.Points[i - 1].Label = $"{s.TotalAmount} ₴";
+            chart.ChartAreas[0].AxisX.CustomLabels.Add(
+                new CustomLabel(i - 0.5, i + 0.5, s.Date.ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None)
+            );
+
+            _realSeries.Points.AddXY(i, s.TotalAmount);
+
+            if (s.PerceptronPrediction > 0)
+            {
+                _perSeries.Points.AddXY(i, s.PerceptronPrediction);
+            }
+
+            if (s.AntPrediction > 0)
+            {
+                _antSeries.Points.AddXY(i, s.AntPrediction);
+            }
+
             i++;
         }
     }
-    
+
+
     private void GettingPredictions()
     {
         using var ant = new AntAlgorithm(7);
@@ -68,7 +111,6 @@ public partial class SellingDiagram : Form
         using var db = new DatabaseController(new());
 
         double[] inputs = new double[7];
-
         double antResult, perResult;
 
         DateTime date = DateTime.Now.AddDays(1);
@@ -85,10 +127,10 @@ public partial class SellingDiagram : Form
 
         if (tomorrow is null)
         {
-            for (int i = 0; i < sales.Count(); i++)
+            for (int j = 0; j < sales.Count(); j++)
             {
-                double amount = (double)sales.ElementAt(i).TotalAmount;
-                inputs[7 - sales.Count() + i] = amount;
+                double amount = (double)sales.ElementAt(j).TotalAmount;
+                inputs[7 - sales.Count() + j] = amount;
             }
 
             antResult = Math.Round(ant.Calculate([.. inputs]), 2);
@@ -104,7 +146,6 @@ public partial class SellingDiagram : Form
             db.Sales.Add(tomorrow);
             db.SaveChanges();
         }
-
         else
         {
             antResult = (double)tomorrow.AntPrediction;
@@ -112,41 +153,20 @@ public partial class SellingDiagram : Form
         }
 
         double last = inputs.Last();
-        DrawLine();
-        DrawAntPred(last, antResult);
-        DrawPerPred(last, perResult);
-    }
-
-    private void DrawLine()
-    {
-        int i = chart.ChartAreas[0].AxisX.CustomLabels.Count;
-        if (chart.ChartAreas[0].AxisX.CustomLabels.Any(x => x.Text == DateTime.Today.AddDays(1).ToString("dd.MM.yyyy")))
-            chart.ChartAreas[0].AxisX.CustomLabels.Add(new CustomLabel(i - 0.5, i + 0.5, DateTime.Today.AddDays(1).ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None));
-    }
-
-    private void DrawAntPred(double last, double prediction)
-    {
-        DrawPrediction(last, prediction, Color.Green);
-    }
-
-    private void DrawPerPred(double last, double prediction)
-    {
-        DrawPrediction(last, prediction, Color.Cyan);
-    }
-
-    private void DrawPrediction(double last, double prediction, Color color)
-    {
-        var series = new Series()
-        {
-            ChartType = SeriesChartType.Line,
-            Color = color,
-            LabelForeColor = color
-        };
-
-        chart.Series.Add(series);
         int i = chart.ChartAreas[0].AxisX.CustomLabels.Count + 1;
-        series.Points.AddXY(i - 3, last);
-        series.Points.AddXY(i - 2, prediction);
-        series.Points[1].Label = $"{prediction} ₴";
+
+        chart.ChartAreas[0].AxisX.CustomLabels.Add(
+            new CustomLabel(i - 0.5, i + 0.5, date.ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None)
+        );
+
+        // Добавляем точки для персептрона
+        _perSeries.Points.AddXY(i - 1, last);
+        _perSeries.Points.AddXY(i, perResult);
+        _perSeries.Points[^1].Label = $"{perResult} ₴";
+
+        // Добавляем точки для муравьёв
+        _antSeries.Points.AddXY(i - 1, last);
+        _antSeries.Points.AddXY(i, antResult);
+        _antSeries.Points[^1].Label = $"{antResult} ₴";
     }
 }
