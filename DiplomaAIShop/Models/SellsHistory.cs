@@ -1,4 +1,6 @@
-﻿namespace DiplomaAIShop.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DiplomaAIShop.Models;
 
 public class SellsHistory
 {
@@ -6,7 +8,8 @@ public class SellsHistory
 
     public DateTime Date { get; set; }
 
-    public decimal TotalAmount => Checks.Sum(x => x.Price);
+    [Column("Summary")]
+    public decimal TotalAmount { get; set; }
 
     public decimal AntPrediction { get; set; }
 

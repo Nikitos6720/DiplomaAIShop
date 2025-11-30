@@ -81,7 +81,7 @@ public partial class SellingDiagram : Form
             .ToList()
             .TakeLast(7);
 
-        var tomorrow = sales.FirstOrDefault(x => x.Date == date);
+        var tomorrow = sales.FirstOrDefault(x => x.Date.Date == date.Date);
 
         if (tomorrow is null)
         {
@@ -111,9 +111,17 @@ public partial class SellingDiagram : Form
             perResult = (double)tomorrow.PerceptronPrediction;
         }
 
-            double last = inputs.Last();
+        double last = inputs.Last();
+        DrawLine();
         DrawAntPred(last, antResult);
         DrawPerPred(last, perResult);
+    }
+
+    private void DrawLine()
+    {
+        int i = chart.ChartAreas[0].AxisX.CustomLabels.Count;
+        if (chart.ChartAreas[0].AxisX.CustomLabels.Any(x => x.Text == DateTime.Today.AddDays(1).ToString("dd.MM.yyyy")))
+            chart.ChartAreas[0].AxisX.CustomLabels.Add(new CustomLabel(i - 0.5, i + 0.5, DateTime.Today.AddDays(1).ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None));
     }
 
     private void DrawAntPred(double last, double prediction)
@@ -135,13 +143,10 @@ public partial class SellingDiagram : Form
             LabelForeColor = color
         };
 
-        int i = chart.ChartAreas[0].AxisX.CustomLabels.Count + 1;
-        if (chart.ChartAreas[0].AxisX.CustomLabels.Any(x => x.Text == DateTime.Today.AddDays(1).ToString("dd.MM.yyyy")))
-            chart.ChartAreas[0].AxisX.CustomLabels.Add(new CustomLabel(i - 0.5, i + 0.5, DateTime.Today.AddDays(1).ToString("dd.MM.yyyy"), 0, LabelMarkStyle.None));
-
         chart.Series.Add(series);
-        series.Points.AddXY(i - 1, last);
-        series.Points.AddXY(i, prediction);
+        int i = chart.ChartAreas[0].AxisX.CustomLabels.Count + 1;
+        series.Points.AddXY(i - 3, last);
+        series.Points.AddXY(i - 2, prediction);
         series.Points[1].Label = $"{prediction} ₴";
     }
 }

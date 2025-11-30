@@ -54,9 +54,9 @@
             CategoryName.AutoSize = true;
             CategoryName.Dock = DockStyle.Bottom;
             CategoryName.Font = new Font("Nova Square", 14F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            CategoryName.Location = new Point(0, 70);
+            CategoryName.Location = new Point(0, 81);
             CategoryName.Name = "CategoryName";
-            CategoryName.Size = new Size(86, 34);
+            CategoryName.Size = new Size(60, 23);
             CategoryName.TabIndex = 2;
             CategoryName.Text = "label1";
             // 
@@ -83,7 +83,7 @@
             // 
             // CategoryInfo
             // 
-            AutoScaleDimensions = new SizeF(11F, 21F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(22, 11, 1);
             ClientSize = new Size(1132, 597);

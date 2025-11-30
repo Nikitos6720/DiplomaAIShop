@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="DiplomaAIShop.Controllers.AI.AntAlgorithm" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAgCgiEACAAAAACAAAgAQAACCAAAIAAAAAAAAAAEUE=</HashCode>
+      <FileName>Controllers\AI\AntAlgorithm.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DiplomaAIShop.Controllers.AI.Perceptron" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgCACAAGAAAgAQAAAAAAAAACCAAIAAgAAEggAAAAE=</HashCode>
+      <FileName>Controllers\AI\Perceptron.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DiplomaAIShop.Controllers.DatabaseController" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAQAAAAAAAAAABAAAEAAAEAACAAAAAAAAAAQ=</HashCode>
+      <FileName>Controllers\DatabaseController.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DiplomaAIShop.Controllers.ErrorController" Collapsed="true">
+    <Position X="8" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\ErrorController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Extenshions.ButtonExtensions" Collapsed="true">
+    <Position X="8" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAQAAEAAAAAgAAAIAAAAAAAAAAAAAAACAAAAAAgAA=</HashCode>
+      <FileName>Extenshions\ButtonExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Extenshions.FormExtensions" Collapsed="true">
+    <Position X="9.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Extenshions\FormExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Mockups.ButtonScheme" Collapsed="true">
+    <Position X="6.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAABgAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Mockups\ButtonScheme.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Models.Check" Collapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAQAAAAAAAAAAAAAAAAAAAEADCAACAAAAAAA=</HashCode>
+      <FileName>Models\Check.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Models.CheckLine" Collapsed="true">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAAgAAQAAAACAAABBAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\CheckLine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Models.Product" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgACIBAAAQAgAAAEEIBABAQAAAAAAAAAAACCAAAAEAA=</HashCode>
+      <FileName>Models\Product.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Models.ProductCategory" Collapsed="true">
+    <Position X="4.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACIAAAAAAgAAAEAABAAAQAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Models\ProductCategory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Models.Removable" Collapsed="true">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Removable.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DiplomaAIShop.Models.SellsHistory" Collapsed="true">
+    <Position X="6.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAACAAgAAAAQAAAAAAAAAAAAAAAAAAABAAAAAAAAAEA=</HashCode>
+      <FileName>Models\SellsHistory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CategoryInfo" Collapsed="true">
+    <Position X="8" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAQBAAAAACAAAACAKAIAAAAAEACAAACAAA=</HashCode>
+      <FileName>Views\Categoryies\CategoryInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CategoryList" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAACAAEAAAAACAAAACAIAoAAAAAFACAAAAAAA=</HashCode>
+      <FileName>Views\Categoryies\CategoryList.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CreateCategory" Collapsed="true">
+    <Position X="6.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAACAABBAAAACAAAACAAAoAAAAEFASAAAAAAA=</HashCode>
+      <FileName>Views\Categoryies\CreateCategory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CheckInfo" Collapsed="true">
+    <Position X="4.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEWAAABCAAACABAACAIAoAAABAFAAAAAABAA=</HashCode>
+      <FileName>Views\Checks\CheckInfo.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CheckList" Collapsed="true">
+    <Position X="2.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAIAAAAACAAABAAAACAAAACAIAIEAAAAEAAAQAABAA=</HashCode>
+      <FileName>Views\Checks\CheckList.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DiplomaAIShop.Views.Diagram.SellingDiagram" Collapsed="true">
+    <Position X="4.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAGAECAAAAAAAACCAAACAAgIAAAAEEBCAQCAAAA=</HashCode>
+      <FileName>Views\Diagram\SellingDiagram.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.CreateProduct" Collapsed="true">
+    <Position X="4.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAEAAAACAAAFAQAACAAAACAQAoAAACEFASAAAAAAA=</HashCode>
+      <FileName>Views\Products\CreateProduct.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.ProductList" Collapsed="true">
+    <Position X="9.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAACAAAAAAAACIAAACAIAoAAAAAFACAAAAAAA=</HashCode>
+      <FileName>Views\Products\ProductList.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="DiplomaAIShop.Program" Collapsed="true">
+    <Position X="2.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.General.ErrorMessageBox" Collapsed="true">
+    <Position X="2.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAACAAABAAAACAAAACAAAgAAAAABAAAQAAAAA=</HashCode>
+      <FileName>Views\General\ErrorMessageBox.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Views.General.General" Collapsed="true">
+    <Position X="2.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAABAAAACAAAACAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Views\General\General.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiplomaAIShop.Main" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GigAQAAAASAAABAAAACAAAhCAMw7oBAQAAAAAUAQQwE=</HashCode>
+      <FileName>Views\General\Main.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="DiplomaAIShop.Controllers.AI.IArtificialIntelligence" Collapsed="true">
+    <Position X="8" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\AI\IArtificialIntelligence.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DiplomaAIShop.Models.IRemovable" Collapsed="true">
+    <Position X="6.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <FileName>Models\IRemovable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DiplomaAIShop.Views.General.IListForm" Collapsed="true">
+    <Position X="6.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Views\General\IListForm.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DiplomaAIShop.Views.General.IMainForm" Collapsed="true">
+    <Position X="8" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Views\General\IMainForm.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DiplomaAIShop.Views.General.IRemovableList" Collapsed="true">
+    <Position X="9.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Views\General\IRemovableList.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

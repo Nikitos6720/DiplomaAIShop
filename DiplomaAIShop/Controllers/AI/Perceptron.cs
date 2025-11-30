@@ -4,27 +4,29 @@ namespace DiplomaAIShop.Controllers.AI;
 
 public class Perceptron : IArtificialIntelligence, IDisposable
 {
-    private readonly int _inputCount;
-    private readonly int _hiddenCount;
-    private readonly int _outputCount;
+    private readonly int _inputCount = 24;
+    private readonly int _hiddenCount1 = 16;
+    private readonly int _hiddenCount2 = 8;
+    private readonly int _outputCount = 1;
 
-    private double[,] _weightsInputHidden;
-    private double[,] _weightsHiddenOutput;
+    private double[,] _weightsInputHidden1;
+    private double[,] _weightsHidden1Hidden2;
+    private double[,] _weightsHidden2Output;
+
     private readonly Random _random;
     private readonly double _learningRate;
-    private readonly int _epoch;
+    private readonly int _epochs;
 
-    public Perceptron()
+    public Perceptron(double learningRate = 0.001, int epochs = 500)
     {
-        _inputCount = 7;
-        _hiddenCount = 3;
-        _outputCount = 1;
+        // вход = окно + 4 признака
+        _weightsInputHidden1 = new double[_inputCount + 4, _hiddenCount1];
+        _weightsHidden1Hidden2 = new double[_hiddenCount1, _hiddenCount2];
+        _weightsHidden2Output = new double[_hiddenCount2, _outputCount];
 
-        _weightsInputHidden = new double[_inputCount, _hiddenCount];
-        _weightsHiddenOutput = new double[_hiddenCount, _outputCount];
         _random = new Random();
-        _learningRate = 0.05;
-        _epoch = 1000;
+        _learningRate = learningRate;
+        _epochs = epochs;
 
         GetParameters();
     }
@@ -37,128 +39,177 @@ public class Perceptron : IArtificialIntelligence, IDisposable
             var parameters = JsonSerializer.Deserialize<Dictionary<string, double[][]>>(json);
             if (parameters != null)
             {
-                _weightsInputHidden = ToMatrix(parameters["WeightsInputHidden"]);
-                _weightsHiddenOutput = ToMatrix(parameters["WeightsHiddenOutput"]);
+                _weightsInputHidden1 = ToMatrix(parameters["WeightsInputHidden1"]);
+                _weightsHidden1Hidden2 = ToMatrix(parameters["WeightsHidden1Hidden2"]);
+                _weightsHidden2Output = ToMatrix(parameters["WeightsHidden2Output"]);
+                return;
             }
         }
 
-        else
-        {
-            for (int i = 0; i < _weightsInputHidden.GetLength(0); i++)
-                for (int j = 0; j < _weightsInputHidden.GetLength(1); j++)
-                    _weightsInputHidden[i, j] = _random.NextDouble() * 2 - 1;
-
-            for (int i = 0; i < _weightsHiddenOutput.GetLength(0); i++)
-                for (int j = 0; j < _weightsHiddenOutput.GetLength(1); j++)
-                    _weightsHiddenOutput[i, j] = _random.NextDouble() * 2 - 1;
-        }
+        InitWeights(_weightsInputHidden1);
+        InitWeights(_weightsHidden1Hidden2);
+        InitWeights(_weightsHidden2Output);
     }
 
-    public double Calculate(double[] inputs)
+    private void InitWeights(double[,] matrix)
     {
-        double max = inputs.Max();
+        for (int i = 0; i < matrix.GetLength(0); i++)
+            for (int j = 0; j < matrix.GetLength(1); j++)
+                matrix[i, j] = (_random.NextDouble() - 0.5) * 2;
+    }
 
-        for (int i = 0; i < inputs.Length; i++)
-            inputs[i] /= max;
+    public double Calculate(double[] rawWindow)
+    {
+        double min = rawWindow.Min();
+        double max = rawWindow.Max();
+        double mean = rawWindow.Average();
+        double std = Math.Sqrt(rawWindow.Select(v => (v - mean) * (v - mean)).Average());
+        double amp = max / Math.Max(min, 1e-9);
+        double vol = std / (mean + 1e-9);
+        double trendIndex = 0.5;
 
-        // Forward pass
-        double[] firstHidden = new double[_hiddenCount];
-        for (int j = 0; j < _hiddenCount; j++)
-        {
-            double sum = 0;
-            for (int i = 0; i < _inputCount; i++)
-                sum += inputs[i] * _weightsInputHidden[i, j];
-            firstHidden[j] = Sigmoid(sum);
-        }
+        double[] normWindow = rawWindow.Select(v => (v - min) / (max - min + 1e-9)).ToArray();
+        double[] features = normWindow
+            .Concat(new[] { amp, vol, mean, trendIndex })
+            .Select(SafeLog).ToArray();
 
-        double output = 0;
-        for (int i = 0; i < _hiddenCount; i++)
-            output += firstHidden[i] * _weightsHiddenOutput[i, 0];
-        output = Sigmoid(output);
+        double[] hidden1 = ForwardLayer(features, _weightsInputHidden1, useReLU: true);
+        double[] hidden2 = ForwardLayer(hidden1, _weightsHidden1Hidden2, useReLU: true);
+        double[] output = ForwardLayer(hidden2, _weightsHidden2Output, useReLU: false); // линейный выход
 
-        return output * max;
+        double logDelta = output[0];
+        double lastValue = rawWindow.Last();
+        return lastValue * Math.Exp(logDelta);
     }
 
     public void Train(double[][] inputs, double[] outputs)
     {
-        double maxInput = inputs.SelectMany(x => x).Max();
-        double maxOutput = outputs.Max();
-        double max = Math.Max(maxInput, maxOutput);
+        List<double[]> featuresList = new();
+        List<double> targets = new();
 
-        double[][] normInputs = inputs
-            .Select(arr => arr.Select(x => x / max).ToArray())
-            .ToArray();
-
-        double[] normOutputs = outputs
-            .Select(x => x / max)
-            .ToArray();
-
-        for (int epoch = 0; epoch < _epoch; epoch++)
+        for (int i = 0; i < inputs.Length - 1; i++)
         {
-            for (int sample = 0; sample < normInputs.Length; sample++)
-            {
-                double[] input = normInputs[sample];
-                double expected = normOutputs[sample];
+            var window = inputs[i];
+            double y_t = outputs[i];
+            double y_t1 = outputs[i + 1];
 
-                double[] firstHidden = new double[_hiddenCount];
-                for (int j = 0; j < _hiddenCount; j++)
+            double min = window.Min();
+            double max = window.Max();
+            double mean = window.Average();
+            double std = Math.Sqrt(window.Select(v => (v - mean) * (v - mean)).Average());
+            double amp = max / Math.Max(min, 1e-9);
+            double vol = std / (mean + 1e-9);
+            double trendIndex = i / (double)(inputs.Length - 1);
+
+            double[] normWindow = window.Select(v => (v - min) / (max - min + 1e-9)).ToArray();
+            double[] features = normWindow
+                .Concat(new[] { amp, vol, mean, trendIndex })
+                .Select(SafeLog).ToArray();
+
+            double deltaLog = SafeLog(y_t1) - SafeLog(y_t);
+
+            featuresList.Add(features);
+            targets.Add(deltaLog);
+
+            if (amp > 1.5 || vol > 0.2)
+            {
+                for (int k = 0; k < 3; k++)
+                {
+                    double scale = 1.0 + 0.05 * k;
+                    double noise = 0.01;
+                    var aug = window.Select(v => v * scale + (_random.NextDouble() - 0.5) * noise).ToArray();
+                    var normAug = aug.Select(v => (v - min) / (max - min + 1e-9)).ToArray();
+                    var augFeatures = normAug
+                        .Concat(new[] { amp, vol, mean, trendIndex })
+                        .Select(SafeLog).ToArray();
+
+                    featuresList.Add(augFeatures);
+                    targets.Add(deltaLog);
+                }
+            }
+        }
+
+        for (int epoch = 0; epoch < _epochs; epoch++)
+        {
+            double totalError = 0;
+
+            for (int sample = 0; sample < featuresList.Count && sample < targets.Count; sample++)
+            {
+                double[] input = featuresList[sample];
+                double expected = targets[sample];
+
+                double[] hidden1 = ForwardLayer(input, _weightsInputHidden1, useReLU: true);
+                double[] hidden2 = ForwardLayer(hidden1, _weightsHidden1Hidden2, useReLU: true);
+                double[] output = ForwardLayer(hidden2, _weightsHidden2Output, useReLU: false);
+
+                double predicted = output[0];
+                double error = expected - predicted;
+                totalError += error * error;
+
+                double deltaOutput = error; // линейный выход
+
+                double[] deltaHidden2 = new double[_hiddenCount2];
+                for (int j = 0; j < _hiddenCount2; j++)
+                {
+                    double sum = deltaOutput * _weightsHidden2Output[j, 0];
+                    deltaHidden2[j] = sum * (hidden2[j] > 0 ? 1 : 0);
+                }
+
+                double[] deltaHidden1 = new double[_hiddenCount1];
+                for (int j = 0; j < _hiddenCount1; j++)
                 {
                     double sum = 0;
-                    for (int i = 0; i < _inputCount; i++)
-                        sum += input[i] * _weightsInputHidden[i, j];
-                    firstHidden[j] = Sigmoid(sum);
+                    for (int k = 0; k < _hiddenCount2; k++)
+                        sum += deltaHidden2[k] * _weightsHidden1Hidden2[j, k];
+                    deltaHidden1[j] = sum * (hidden1[j] > 0 ? 1 : 0);
                 }
 
-                double output = 0;
-                for (int i = 0; i < _hiddenCount; i++)
-                    output += firstHidden[i] * _weightsHiddenOutput[i, 0];
-                output = Sigmoid(output);
+                for (int j = 0; j < _hiddenCount2; j++)
+                    _weightsHidden2Output[j, 0] += _learningRate * deltaOutput * hidden2[j];
 
-                double deltaOutput = (expected - output) * output * (1 - output);
+                for (int i = 0; i < _hiddenCount1; i++)
+                    for (int j = 0; j < _hiddenCount2; j++)
+                        _weightsHidden1Hidden2[i, j] += _learningRate * deltaHidden2[j] * hidden1[i];
 
-                double[] deltaFirstHidden = new double[_hiddenCount];
-                for (int i = 0; i < _hiddenCount; i++)
-                {
-                    double sum = deltaOutput * _weightsHiddenOutput[i, 0];
-                    deltaFirstHidden[i] = sum * firstHidden[i] * (1 - firstHidden[i]);
-                }
-
-                for (int i = 0; i < _hiddenCount; i++)
-                    _weightsHiddenOutput[i, 0] += _learningRate * deltaOutput * firstHidden[i];
-
-                for (int i = 0; i < _inputCount; i++)
-                    for (int j = 0; j < _hiddenCount; j++)
-                        _weightsInputHidden[i, j] += _learningRate * deltaFirstHidden[j] * input[i];
+                for (int i = 0; i < _weightsInputHidden1.GetLength(0); i++)
+                    for (int j = 0; j < _hiddenCount1; j++)
+                        _weightsInputHidden1[i, j] += _learningRate * deltaHidden1[j] * input[i];
             }
+
+            if (epoch % 100 == 0)
+                Console.WriteLine($"Epoch {epoch}, Error: {totalError / featuresList.Count}");
         }
     }
 
-    public void Dispose()
+    private static double[] ForwardLayer(double[] inputs, double[,] weights, bool useReLU)
     {
-        // Сериализация весов в файл (пример для двумерных массивов)
-        var parameters = new
+        double[] outputs = new double[weights.GetLength(1)];
+        
+        for (int j = 0; j < outputs.Length; j++)
         {
-            WeightsInputHidden = ToJaggedArray(_weightsInputHidden),
-            WeightsHiddenOutput = ToJaggedArray(_weightsHiddenOutput),
-        };
+            double sum = 0;
+            for (int i = 0; i < inputs.Length; i++)
+                sum += inputs[i] * weights[i, j];
 
-        var json = JsonSerializer.Serialize(parameters);
-        File.WriteAllText("perceptron_parameters.json", json);
+            outputs[j] = useReLU ? ReLU(sum) : sum; // линейный выход
+        }
+
+        return outputs;
     }
-
-    private double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
     private double[][] ToJaggedArray(double[,] matrix)
     {
         int rows = matrix.GetLength(0);
         int cols = matrix.GetLength(1);
         var result = new double[rows][];
+
         for (int i = 0; i < rows; i++)
         {
             result[i] = new double[cols];
             for (int j = 0; j < cols; j++)
                 result[i][j] = matrix[i, j];
         }
+
         return result;
     }
 
@@ -167,10 +218,34 @@ public class Perceptron : IArtificialIntelligence, IDisposable
         int rows = jagged.Length;
         int cols = jagged[0].Length;
         var result = new double[rows, cols];
+
         for (int i = 0; i < rows; i++)
             for (int j = 0; j < cols; j++)
                 result[i, j] = jagged[i][j];
 
         return result;
+    }
+
+    private static double ReLU(double x) => Math.Max(0, x);
+
+    private double SafeLog(double x) => Math.Log(x + 1.0);
+
+    public void Dispose()
+    {
+        SaveParameters();
+        GC.SuppressFinalize(this);
+    }
+
+    private void SaveParameters()
+    {
+        var parameters = new
+        {
+            WeightsInputHidden1 = ToJaggedArray(_weightsInputHidden1),
+            WeightsHidden1Hidden2 = ToJaggedArray(_weightsHidden1Hidden2),
+            WeightsHidden2Output = ToJaggedArray(_weightsHidden2Output),
+        };
+
+        var json = JsonSerializer.Serialize(parameters);
+        File.WriteAllText("perceptron_parameters.json", json);
     }
 }
